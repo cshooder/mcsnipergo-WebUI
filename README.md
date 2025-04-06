@@ -2,25 +2,50 @@
   <img src="https://i.imgur.com/ShMq72J.png" alt="MCsniperGO"></img>
 
   
-  By Kqzz
+  Originally by kqzz. Expanded upon by cshooder
 </h3>
 
 <p align="center">
     <a href="https://github.com/Kqzz/MCsniperGO/releases/"><img alt="downloads" src="https://img.shields.io/github/downloads/Kqzz/MCsniperGO/total?color=%233889c4" height="22"></a>
-    <a href="https://discord.gg/mcsnipergo-734794891258757160"><img alt="Discord" src="https://img.shields.io/discord/734794891258757160?label=discord&color=%233889c4&logo=discord&logoColor=white" height="22"></a>
-    <h3 align="center" > <a href="https://discord.gg/mcsnipergo-734794891258757160">Join Discord</a> </h3>
 </p>
 
-## Usage
+MCsniperGO is a Minecraft username sniper with both a web-based user interface and a command-line interface. It allows you to automatically claim Minecraft usernames when they become available. This version has been significantly expanded by cshooder, adding a modern web UI and various improvements to the original codebase by kqzz.
+
+## Features
+
+- **Modern Web UI**: Easy-to-use interface created by cshooder for sniping usernames without command-line knowledge
+- **Account Management**: Support for both Gift Code accounts (no usernames) and Microsoft accounts
+- **Proxy Support**: Use proxies to avoid rate limits
+- **Efficient Sniping**: Written in Go for high performance
+- **Enhanced Experience**: Streamlined workflow and improved reliability
+
+## Usage - Web Interface
+
+The new web interface by cshooder makes sniping usernames easier than ever:
+
+1. [Install go](https://go.dev/dl/)
+2. Download or clone the MCsniperGO repository
+3. Open MCsniperGO folder in your terminal/cmd
+4. Run `go run ./web/server.go` to start the web server
+5. Open your browser and navigate to `http://localhost:8080` (or the configured port)
+6. Use the web interface to:
+   - Enter your accounts in the configuration section
+   - Add proxies
+   - Enter the target username and snipe delay
+   - Start sniping with a single click
+
+## Usage - Command Line Interface
+
+For those who prefer the command line:
 
 - [Install go](https://go.dev/dl/)
 - Download or clone MCsniperGO repository 
-- open MCsniperGO folder in your terminal / cmd
-- put your prename accounts (no claimed username) in [`gc.txt`](#accounts-formatting) and your normal accounts in [`ms.txt`](#accounts-formatting)
-- put proxies into `proxies.txt` in the format `user:pass@ip:port` (there should NOT be 4 `:` in it as many proxy providers provide it as)
-- run `go run ./cmd/cli`
-- enter username + [claim range](#claim-range)
-- wait, and hope you claim the username!
+- Open MCsniperGO folder in your terminal / cmd
+- Put your prename accounts (no claimed username) in [`gc.txt`](#accounts-formatting) and your normal accounts in [`ms.txt`](#accounts-formatting)
+- Put proxies into `proxies.txt` in the format `user:pass@ip:port` (there should NOT be 4 `:` in it as many proxy providers provide it as)
+- Run `go run ./cmd/cli`
+- Enter username + [claim range](#claim-range)
+- Wait, and hope you claim the username!
 
 ## Claim Range
 Use the following Javascript bookmarklet in your browser to obtain the droptime while on `namemc.com/search?q=<username>`:
@@ -63,12 +88,13 @@ javascript: (function() {
 })()
 ```
 
-## accounts formatting
+## Accounts Formatting
 
-- place in `gc.txt` or `ms.txt` depending on their account type.
+- Place in `gc.txt` or `ms.txt` depending on their account type.
   - `gc.txt` is for accounts without usernames
   - `ms.txt` is for accounts that already have usernames on them
-- a bearer token can be obtained by following  [this guide](https://kqzz.github.io/mc-bearer-token/)
+  - **Web UI users**: You can add these directly through the interface
+- A bearer token can be obtained by following [this guide](https://kqzz.github.io/mc-bearer-token/)
 
 ```txt
 EMAIL:PASSWORD
@@ -86,7 +112,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 > Their account types are determined by if they are placed in `gc.txt` or `ms.txt`.
 
-## understanding logs
+## Understanding Logs
 
 Each request made to change your username will return a 3 digit HTTP status code, the meanings are as follows:
 

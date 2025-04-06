@@ -4,47 +4,49 @@ import (
 	"fmt"
 
 	"github.com/Kqzz/MCsniperGO/log"
-	"github.com/Kqzz/MCsniperGO/pkg/mc"
+	mc "github.com/Kqzz/MCsniperGO/pkg/mc"
 	"github.com/Kqzz/MCsniperGO/pkg/parser"
 )
 
+// getAccounts parses accounts from the specified files.
+// It logs errors during parsing but returns successfully even if some files fail,
+// unless NO accounts are successfully parsed.
 func getAccounts(giftCodePath string, gamepassPath string, microsoftPath string) ([]*mc.MCaccount, error) {
 	giftCodeLines, _ := parser.ReadLines(giftCodePath)
 	gamepassLines, _ := parser.ReadLines(gamepassPath)
 	microsoftLines, _ := parser.ReadLines(microsoftPath)
 
-	gcs, parseErrors := parser.ParseAccounts(giftCodeLines, mc.MsPr)
+	accounts := []*mc.MCaccount{}
+	var parseErrors []error
 
-	for _, er := range parseErrors {
-		if er == nil {
-			continue
-		}
-		log.Log("err", "%v", er)
-	}
-	microsofts, msParseErrors := parser.ParseAccounts(microsoftLines, mc.Ms)
+	gcs, gcErrs := parser.ParseAccounts(giftCodeLines, mc.MsPr)
+	accounts = append(accounts, gcs...)
+	parseErrors = append(parseErrors, gcErrs...)
 
-	for _, er := range msParseErrors {
-		if er == nil {
-			continue
-		}
-		log.Log("err", "%v", er)
-	}
+	microsofts, msErrs := parser.ParseAccounts(microsoftLines, mc.Ms)
+	accounts = append(accounts, microsofts...)
+	parseErrors = append(parseErrors, msErrs...)
 
-	gamepasses, gpParseErrors := parser.ParseAccounts(gamepassLines, mc.MsGp)
-
-	for _, er := range gpParseErrors {
-		if er == nil {
-			continue
-		}
-
-	}
-
-	accounts := append(gcs, microsofts...)
+	gamepasses, gpErrs := parser.ParseAccounts(gamepassLines, mc.MsGp)
 	accounts = append(accounts, gamepasses...)
+	parseErrors = append(parseErrors, gpErrs...)
+
+	// Log any parsing errors encountered
+	foundError := false
+	for _, er := range parseErrors {
+		if er != nil {
+			log.Log("err", "Account parsing error: %v", er)
+			foundError = true
+		}
+	}
+	if foundError {
+		log.Log("warn", "Some accounts failed to parse. Check logs above.")
+	}
 
 	if len(accounts) == 0 {
-		return accounts, fmt.Errorf("no accounts found in: gc.txt, ms.txt, gp.txt")
+		return nil, fmt.Errorf("no accounts successfully parsed from: %s, %s, %s", giftCodePath, gamepassPath, microsoftPath)
 	}
 
+	log.Log("succ", "Successfully parsed %d accounts", len(accounts))
 	return accounts, nil
 }

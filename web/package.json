@@ -1,0 +1,11 @@
+{
+  "name": "mcsnipergo-web",
+  "version": "1.0.0",
+  "description": "Web interface for MCsniperGO",
+  "scripts": {
+    "build:css": "tailwindcss -i ./input.css -o ./output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.0" 
+  }
+} 

@@ -11,16 +11,23 @@ import (
 	"github.com/Kqzz/MCsniperGO/claimer"
 	"github.com/Kqzz/MCsniperGO/log"
 	"github.com/Kqzz/MCsniperGO/pkg/parser"
+	"github.com/Kqzz/MCsniperGO/pkg/webserver"
 )
 
 const help = `usage:
     mcsnipergo [options]
 options:
-    --username, -u <str>    username to snipe
-	--disable-bar           disables the status bar
+    --username, -u <str>    username to snipe (CLI mode)
+	--disable-bar           disables the status bar (CLI mode)
+	--web                   run in web server mode instead of CLI
+	--port <str>            port for web server (default: ":8080")
 `
 
-var disableBar bool
+var (
+	disableBar bool
+	webMode    bool
+	webPort    string
+)
 
 func init() {
 	flag.Usage = func() {
@@ -58,17 +65,24 @@ func statusBar(startTime time.Time) {
 	fmt.Print("\x1B8") // Restore the cursor position util new size is calculated
 }
 
-func main() {
-
+func runCli() {
 	var startUsername string
 	flag.StringVar(&startUsername, "username", "", "username to snipe")
 	flag.StringVar(&startUsername, "u", "", "username to snipe")
 	flag.BoolVar(&disableBar, "disable-bar", false, "disables status bar")
+	flag.BoolVar(&webMode, "web", false, "run in web server mode")
+	flag.StringVar(&webPort, "port", ":8080", "port for web server")
+
 	if isFlagPassed("disable-bar") {
 		disableBar = true
 	}
 
 	flag.Parse()
+
+	if webMode {
+		webserver.StartWebServer(webPort)
+		return
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -84,7 +98,6 @@ func main() {
 
 		log.Log("", log.GetHeader())
 
-		// Get proxies, program continues even if this fails
 		proxies, err := parser.ReadLines("proxies.txt")
 
 		if err != nil {
@@ -93,7 +106,6 @@ func main() {
 
 		err = nil
 
-		// get accounts, fails if no accs present
 		accounts, err := getAccounts("gc.txt", "gp.txt", "ms.txt")
 
 		if err != nil {
@@ -141,5 +153,8 @@ func main() {
 
 		log.Input("snipe completed, press enter to continue")
 	}
+}
 
+func main() {
+	runCli()
 }
